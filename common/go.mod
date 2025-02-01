@@ -1,4 +1,4 @@
-module github.com/palashbhasme/services/common
+module github.com/palashbhasme/ecommerce_microservices/common
 
 go 1.23.1
 

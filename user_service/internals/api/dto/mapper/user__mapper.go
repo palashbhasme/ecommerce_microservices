@@ -3,9 +3,9 @@ package mapper
 import (
 	"time"
 
-	"github.com/palashbhasme/user_service/internals/api/dto/request"
-	"github.com/palashbhasme/user_service/internals/api/dto/response"
-	"github.com/palashbhasme/user_service/internals/domain/models"
+	"github.com/palashbhasme/ecommerce_microservices/user_service/internals/api/dto/request"
+	"github.com/palashbhasme/ecommerce_microservices/user_service/internals/api/dto/response"
+	"github.com/palashbhasme/ecommerce_microservices/user_service/internals/domain/models"
 )
 
 // MapUserToResponse maps a User model to a UserResponse struct.

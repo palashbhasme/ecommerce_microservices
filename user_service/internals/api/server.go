@@ -2,7 +2,7 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/palashbhasme/user_service/internals/domain/repository"
+	"github.com/palashbhasme/ecommerce_microservices/user_service/internals/domain/repository"
 	"go.uber.org/zap"
 )
 

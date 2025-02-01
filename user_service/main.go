@@ -8,10 +8,10 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/joho/godotenv"
-	"github.com/palashbhasme/user_service/internals/api"
-	"github.com/palashbhasme/user_service/internals/db"
-	"github.com/palashbhasme/user_service/internals/domain/repository"
-	"github.com/palashbhasme/user_service/utils"
+	"github.com/palashbhasme/ecommerce_microservices/user_service/internals/api"
+	"github.com/palashbhasme/ecommerce_microservices/user_service/internals/db"
+	"github.com/palashbhasme/ecommerce_microservices/user_service/internals/domain/repository"
+	"github.com/palashbhasme/ecommerce_microservices/user_service/utils"
 )
 
 func main() {

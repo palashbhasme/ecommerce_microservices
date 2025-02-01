@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"github.com/palashbhasme/inventory_service/internals/domain/models"
+	"github.com/palashbhasme/ecommerce_microservices/inventory_service/internals/domain/models"
 )
 
 type CategoryRepository interface {

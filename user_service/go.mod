@@ -1,4 +1,4 @@
-module github.com/palashbhasme/user_service
+module github.com/palashbhasme/ecommerce_microservices/user_service
 
 go 1.23.1
 

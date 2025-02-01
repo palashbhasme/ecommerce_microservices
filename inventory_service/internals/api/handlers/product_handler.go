@@ -5,9 +5,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"github.com/palashbhasme/inventory_service/internals/api/dto/mapper"
-	"github.com/palashbhasme/inventory_service/internals/api/dto/request"
-	"github.com/palashbhasme/inventory_service/internals/domain/repository"
+	"github.com/palashbhasme/ecommerce_microservices/inventory_service/internals/api/dto/mapper"
+	"github.com/palashbhasme/ecommerce_microservices/inventory_service/internals/api/dto/request"
+	"github.com/palashbhasme/ecommerce_microservices/inventory_service/internals/domain/repository"
 	"go.uber.org/zap"
 )
 

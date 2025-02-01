@@ -2,8 +2,8 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/palashbhasme/inventory_service/internals/api/handlers"
-	"github.com/palashbhasme/inventory_service/internals/domain/repository"
+	"github.com/palashbhasme/ecommerce_microservices/inventory_service/internals/api/handlers"
+	"github.com/palashbhasme/ecommerce_microservices/inventory_service/internals/domain/repository"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )

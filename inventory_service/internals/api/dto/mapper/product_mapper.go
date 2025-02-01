@@ -3,10 +3,10 @@ package mapper
 import (
 	"time"
 
-	"github.com/palashbhasme/inventory_service/internals/api/dto/request"
-	"github.com/palashbhasme/inventory_service/internals/api/dto/response"
+	"github.com/palashbhasme/ecommerce_microservices/inventory_service/internals/api/dto/request"
+	"github.com/palashbhasme/ecommerce_microservices/inventory_service/internals/api/dto/response"
 
-	"github.com/palashbhasme/inventory_service/internals/domain/models"
+	"github.com/palashbhasme/ecommerce_microservices/inventory_service/internals/domain/models"
 )
 
 // MapProductToResponse maps a Product model to the ProductResponse struct

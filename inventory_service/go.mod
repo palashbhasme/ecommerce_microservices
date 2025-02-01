@@ -1,4 +1,4 @@
-module github.com/palashbhasme/inventory_service
+module github.com/palashbhasme/ecommerce_microservices/inventory_service
 
 go 1.23.1
 

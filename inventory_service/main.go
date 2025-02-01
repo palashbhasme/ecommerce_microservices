@@ -6,10 +6,10 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
-	"github.com/palashbhasme/inventory_service/internals/api"
-	"github.com/palashbhasme/inventory_service/internals/db"
-	"github.com/palashbhasme/inventory_service/internals/domain/models"
-	"github.com/palashbhasme/inventory_service/utils"
+	"github.com/palashbhasme/ecommerce_microservices/inventory_service/internals/api"
+	"github.com/palashbhasme/ecommerce_microservices/inventory_service/internals/db"
+	"github.com/palashbhasme/ecommerce_microservices/inventory_service/internals/domain/models"
+	"github.com/palashbhasme/ecommerce_microservices/inventory_service/utils"
 	"go.uber.org/zap"
 )
 

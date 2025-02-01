@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"github.com/palashbhasme/user_service/internals/domain/models"
+	"github.com/palashbhasme/ecommerce_microservices/user_service/internals/domain/models"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 

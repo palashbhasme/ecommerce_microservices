@@ -3,7 +3,7 @@ package repository
 import (
 	"fmt"
 
-	"github.com/palashbhasme/inventory_service/internals/domain/models"
+	"github.com/palashbhasme/ecommerce_microservices/inventory_service/internals/domain/models"
 	"gorm.io/gorm"
 )
 

@@ -4,10 +4,10 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/palashbhasme/user_service/internals/api/dto/mapper"
-	"github.com/palashbhasme/user_service/internals/api/dto/request"
-	"github.com/palashbhasme/user_service/internals/api/dto/response"
-	"github.com/palashbhasme/user_service/internals/domain/repository"
+	"github.com/palashbhasme/ecommerce_microservices/user_service/internals/api/dto/mapper"
+	"github.com/palashbhasme/ecommerce_microservices/user_service/internals/api/dto/request"
+	"github.com/palashbhasme/ecommerce_microservices/user_service/internals/api/dto/response"
+	"github.com/palashbhasme/ecommerce_microservices/user_service/internals/domain/repository"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.uber.org/zap"
 )

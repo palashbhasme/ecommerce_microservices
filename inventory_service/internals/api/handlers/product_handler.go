@@ -33,7 +33,7 @@ func NewProductHandler(router *gin.Engine, repo repository.ProductRepository, lo
 			productRoutes.GET("/getByCategoryID/:categoryID", productHandler.GetProductsByCategoryID)
 			productRoutes.GET("/getByCategoryName/:categoryName", productHandler.GetProductsByCategoryName)
 			productRoutes.POST("/checkStock/:id", productHandler.CheckStockLevel)
-			productRoutes.POST("/updateStock/:id", productHandler.UpdateStockLevel)
+			// productRoutes.POST("/updateStock/:id", productHandler.UpdateStockLevel) //no longer needed as it is handeld by rabbitmq
 		}
 	}
 }
@@ -153,36 +153,36 @@ func (h *ProductHandler) CheckStockLevel(c *gin.Context) {
 
 	quantity := quantityRequest.Quantity
 
-	stockLevel, err := h.repo.CheckStockLevel(variantID, quantity)
+	stockLevel, price, err := h.repo.CheckStockLevel(variantID, quantity)
 	if err != nil {
 		h.logger.Error("error checking stock leveles", zap.Error(err), zap.String("variant_id", variantID))
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Error checking stock level", "error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"stock_level": stockLevel})
+	c.JSON(http.StatusOK, gin.H{"stock_level": stockLevel, "price": price})
 }
 
-func (h *ProductHandler) UpdateStockLevel(c *gin.Context) {
-	var quantityRequest request.UpdateQuantityRequest
-	h.logger.Info("Updating stock level")
+// func (h *ProductHandler) UpdateStockLevel(c *gin.Context) {
+// 	var quantityRequest request.UpdateQuantityRequest
+// 	h.logger.Info("Updating stock level")
 
-	variantID := c.Param("id")
+// 	variantID := c.Param("id")
 
-	if err := c.ShouldBindJSON(&quantityRequest); err != nil {
-		h.logger.Error("failed to bind request body", zap.Error(err), zap.String("variant_id", variantID))
-		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid request body"})
-		return
-	}
+// 	if err := c.ShouldBindJSON(&quantityRequest); err != nil {
+// 		h.logger.Error("failed to bind request body", zap.Error(err), zap.String("variant_id", variantID))
+// 		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid request body"})
+// 		return
+// 	}
 
-	quantity := quantityRequest.Quantity
+// 	quantity := quantityRequest.Quantity
 
-	newStockLevel, err := h.repo.DecrementStockLevel(variantID, quantity)
-	if err != nil {
-		h.logger.Error("error updating stock leveles", zap.Error(err), zap.String("variant_id", variantID))
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Error updating stock leveles", "error": err.Error()})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{"remaining_stock": newStockLevel})
+// 	newStockLevel, err := h.repo.DecrementStockLevel(variantID, quantity)
+// 	if err != nil {
+// 		h.logger.Error("error updating stock leveles", zap.Error(err), zap.String("variant_id", variantID))
+// 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Error updating stock leveles", "error": err.Error()})
+// 		return
+// 	}
+// 	c.JSON(http.StatusOK, gin.H{"remaining_stock": newStockLevel})
 
-}
+// }

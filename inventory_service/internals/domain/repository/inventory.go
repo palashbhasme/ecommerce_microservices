@@ -183,7 +183,7 @@ func (r *PostgresRepository) DeleteProductVariant(id string) error {
 	return nil
 }
 
-func (r *PostgresRepository) CheckStockLevel(variantID string, quantity int) (int, error) {
+func (r *PostgresRepository) CheckStockLevel(variantID string, quantity int) (int, *float64, error) {
 	var variant models.ProductVariant
 
 	// Query the product variant by its ID
@@ -191,51 +191,64 @@ func (r *PostgresRepository) CheckStockLevel(variantID string, quantity int) (in
 	if err != nil {
 		// Return 0 and the error if no variant is found
 		if err == gorm.ErrRecordNotFound {
-			return 0, fmt.Errorf("variant not found")
+			return 0, nil, fmt.Errorf("variant not found")
 		}
-		return 0, err
+		return 0, nil, err
 	}
 
 	// Check if the available stock is sufficient
 	if variant.StockQuantity < quantity {
-		return variant.StockQuantity, fmt.Errorf("insufficient stock, available: %d", variant.StockQuantity)
+		return variant.StockQuantity, nil, fmt.Errorf("insufficient stock, available: %d", variant.StockQuantity)
 	}
 
 	// Return the available stock level
-	return variant.StockQuantity, nil
+	return variant.StockQuantity, variant.Price, nil
 }
 
-func (r *PostgresRepository) DecrementStockLevel(variantID string, quantity int) (int, error) {
-
+// DecrementStockLevel returns true and total price of all items in order if the order items are available in inventory else return false and 0
+func (r *PostgresRepository) DecrementStockLevel(variantIDs []string, quantities []int) (bool, float64, error) {
 	tx := r.db.Begin()
+	var totalPrice float64
 
-	var variant models.ProductVariant
-
-	result := tx.Where("id = ?", variantID).First(&variant)
-
-	if result.Error != nil {
+	if len(variantIDs) != len(quantities) {
 		tx.Rollback()
-		if result.Error == gorm.ErrRecordNotFound {
-			return 0, fmt.Errorf("variant not found")
+		return false, 0, fmt.Errorf("mismatch in variantIDs and quantities length")
+	}
+
+	for i, variantID := range variantIDs {
+		var variant models.ProductVariant
+
+		// Fetch product variant
+		result := tx.Where("id = ?", variantID).First(&variant)
+		if result.Error != nil {
+			tx.Rollback()
+			if result.Error == gorm.ErrRecordNotFound {
+				return false, 0, fmt.Errorf("variant %s not found", variantID)
+			}
+			return false, 0, result.Error
 		}
-		return 0, result.Error
+
+		// Check stock availability
+		if variant.StockQuantity < quantities[i] {
+			tx.Rollback()
+			return false, 0, fmt.Errorf("insufficient stock for %s, available: %d", variantID, variant.StockQuantity)
+		}
+
+		// Deduct stock and calculate total price
+		variant.StockQuantity -= quantities[i]
+		totalPrice += float64(quantities[i]) * *variant.Price
+
+		// Save updated variant
+		if err := tx.Save(&variant).Error; err != nil {
+			tx.Rollback()
+			return false, 0, err
+		}
 	}
 
-	if variant.StockQuantity < quantity {
-		// Rollback if there's insufficient stock
-		tx.Rollback()
-		return variant.StockQuantity, fmt.Errorf("insufficient stock, available: %d", variant.StockQuantity)
-	}
-	variant.StockQuantity -= quantity
-	if err := tx.Save(&variant).Error; err != nil {
-		// Rollback if the update fails
-		tx.Rollback()
-		return 0, err
-	}
-
+	// Commit transaction
 	if err := tx.Commit().Error; err != nil {
-		return 0, err
+		return false, 0, err
 	}
 
-	return variant.StockQuantity, nil
+	return true, totalPrice, nil
 }

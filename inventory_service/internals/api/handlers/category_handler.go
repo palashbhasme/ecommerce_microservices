@@ -27,10 +27,10 @@ func NewCategoryHandler(router *gin.Engine, repo repository.CategoryRepository, 
 	{
 		categoryRoutes := api.Group("/category/v1")
 		{
-			categoryRoutes.POST("/", categoryHandler.CreateCategory)
 			categoryRoutes.GET("/:id", categoryHandler.GetCategory)
 			categoryRoutes.GET("/getAll", categoryHandler.GetAllCategories)
 			categoryRoutes.PUT("/update/:id", categoryHandler.UpdateCategory)
+			categoryRoutes.POST("/", categoryHandler.CreateCategory)
 			categoryRoutes.DELETE("/delete/:id", categoryHandler.DeleteCategory)
 		}
 	}

@@ -21,8 +21,8 @@ type ProductRepository interface {
 	GetProductsByCategoryName(categoryName string) ([]models.Product, error)
 	UpdateProduct(id string, product *models.Product) error
 	DeleteProduct(id string) error
-	CheckStockLevel(variantID string, quantity int) (int, error)
-	DecrementStockLevel(variantID string, quantity int) (int, error)
+	CheckStockLevel(variantID string, quantity int) (int, *float64, error)
+	DecrementStockLevel(variantID []string, quantity []int) (bool, float64, error) //rabbit mq functions
 }
 
 type ProductVariantRepository interface {

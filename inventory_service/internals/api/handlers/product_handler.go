@@ -8,6 +8,7 @@ import (
 	"github.com/palashbhasme/ecommerce_microservices/inventory_service/internals/api/dto/mapper"
 	"github.com/palashbhasme/ecommerce_microservices/inventory_service/internals/api/dto/request"
 	"github.com/palashbhasme/ecommerce_microservices/inventory_service/internals/domain/repository"
+
 	"go.uber.org/zap"
 )
 

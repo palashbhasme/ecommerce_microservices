@@ -1,8 +1,10 @@
 package rabbitmq
 
 import (
+	"context"
 	"encoding/json"
 
+	"github.com/palashbhasme/ecommerce_microservices/common"
 	"github.com/palashbhasme/order_service/internals/api/dto/request"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"go.uber.org/zap"
@@ -15,37 +17,27 @@ type InventoryRequest struct {
 }
 
 // PublishInventoryCheck sends an order inventory check request via RabbitMQ
-func PublishInventoryCheck(orderID string, items []request.OrderItemReq, logger *zap.Logger) error {
-	// Establish a single RabbitMQ connection (consider moving this to a shared package)
-	conn, err := amqp.Dial("amqp://percy:secret@localhost:5672/backend")
-	if err != nil {
-		logger.Error("Failed to connect to RabbitMQ", zap.Error(err))
-		return err
-	}
-	defer conn.Close()
+func PublishInventoryCheck(orderID string, items []request.OrderItemReq, logger *zap.Logger, conn *amqp.Connection) error {
 
-	ch, err := conn.Channel()
+	client, err := common.NewRabbitMQClient(conn)
 	if err != nil {
-		logger.Error("Failed to open a channel", zap.Error(err))
+		logger.Error("Failed to get a client", zap.Error(err))
 		return err
 	}
-	defer ch.Close()
+	defer client.Close()
 
 	// Declare the exchange (should be "direct" if using a specific routing key)
-	err = ch.ExchangeDeclare(
-		"inventory_check", // Exchange name
-		"direct",          // Type (use "fanout" if multiple consumers)
-		true,              // Durable (ensures persistence)
-		false,             // Auto-delete
-		false,             // Internal
-		false,             // No-wait
-		nil,               // Arguments
-	)
+	err = client.CreateExchange("inventory_check", "direct", true, false, false, false)
 	if err != nil {
 		logger.Error("Failed to declare exchange", zap.Error(err))
 		return err
 	}
-
+	// Declare queue
+	err = client.CreateQueue("inventory_check", true, false)
+	if err != nil {
+		logger.Fatal("error declaring queue", zap.Error(err))
+		return err
+	}
 	// Create the inventory request payload
 	inventoryRequest := InventoryRequest{
 		OrderID: orderID,
@@ -59,16 +51,13 @@ func PublishInventoryCheck(orderID string, items []request.OrderItemReq, logger 
 	}
 
 	// Publish message to the exchange
-	err = ch.Publish(
-		"inventory_check",     // Exchange name
-		"inventory_check_key", // Routing key
-		true,                  // Mandatory
-		false,                 // Immediate
+
+	err = client.Send(context.TODO(), "inventory_check", "inventory_check_key",
 		amqp.Publishing{
 			ContentType: "application/json",
 			Body:        body,
-		},
-	)
+		})
+
 	if err != nil {
 		logger.Error("Failed to publish message", zap.Error(err))
 		return err

@@ -7,5 +7,5 @@ type OrdersRepository interface {
 	GetOrderByID(id string) (*models.Order, error)
 	UpdateOrder(id string, order *models.Order) error
 	CreateOrderItem(orderItem *models.OrderItem) error
-	UpdateOrderItem(id string, orderItem *models.OrderItem) error
+	UpdateOrderStatus(id string, updates map[string]interface{}) error
 }

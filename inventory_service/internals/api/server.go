@@ -10,19 +10,22 @@ import (
 )
 
 func RunServer(logger *zap.Logger, db *gorm.DB) error {
-	router := gin.Default()
-	// Start RabbitMQ consumer in a separate goroutine
 
-	// Configure routes here if needed
+	conn, err := rabbitmq.InitializeRabbit()
+	if err != nil {
+		logger.Error("Failed to connect to rabbit mq", zap.Error(err))
+	}
 	repo := repository.NewPostgresRepository(db)
 	go func() {
-		rabbitmq.ConsumeInventoryCheck(logger, *repo)
+		err = rabbitmq.InventoryCheckConsumer(logger, *repo, conn.Conn)
+		logger.Error("consume inventory check stopped", zap.Error(err))
 	}()
 
+	router := gin.Default()
 	handlers.NewCategoryHandler(router, repo, logger)
 	handlers.NewProductHandler(router, repo, logger)
 
-	err := router.Run(":8081")
+	err = router.Run(":8081")
 	if err != nil {
 		return err
 	}

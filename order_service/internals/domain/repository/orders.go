@@ -54,6 +54,6 @@ func (r *PostgresRepository) CreateOrderItem(orderItem *models.OrderItem) error 
 	return r.db.Create(&orderItem).Error
 }
 
-func (r *PostgresRepository) UpdateOrderItem(id string, orderItem *models.OrderItem) error {
-	return r.db.Updates(orderItem).Error
+func (r *PostgresRepository) UpdateOrderStatus(id string, updates map[string]interface{}) error {
+	return r.db.Model(&models.Order{}).Where("order_id = ?", id).Updates(updates).Error
 }

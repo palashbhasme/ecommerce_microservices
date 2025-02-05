@@ -9,18 +9,21 @@ import (
 	"github.com/palashbhasme/order_service/internals/api/rabbitmq"
 	"github.com/palashbhasme/order_service/internals/domain/models"
 	"github.com/palashbhasme/order_service/internals/domain/repository"
+	"github.com/rabbitmq/amqp091-go"
 	"go.uber.org/zap"
 )
 
 type OrderHandler struct {
-	repo   repository.OrdersRepository
-	logger *zap.Logger
+	repo       repository.OrdersRepository
+	logger     *zap.Logger
+	connRabbit *amqp091.Connection
 }
 
-func InitializeOrderHandler(router *gin.Engine, repo repository.OrdersRepository, logger *zap.Logger) {
+func InitializeOrderHandler(router *gin.Engine, repo repository.OrdersRepository, logger *zap.Logger, config rabbitmq.RabbitMQConfig) {
 	orderHandler := OrderHandler{
-		repo:   repo,
-		logger: logger,
+		repo:       repo,
+		logger:     logger,
+		connRabbit: config.Conn,
 	}
 
 	api := router.Group("/api")
@@ -64,7 +67,7 @@ func (h *OrderHandler) CreateOrder(c *gin.Context) {
 		return
 	}
 
-	err = rabbitmq.PublishInventoryCheck(orderID, orderRequest.OrderItems, h.logger)
+	err = rabbitmq.PublishInventoryCheck(orderID, orderRequest.OrderItems, h.logger, h.connRabbit)
 	if err != nil {
 		h.logger.Error("error publishing order", zap.Error(err))
 		c.JSON(500, gin.H{"message": "internal server error"})

@@ -65,8 +65,12 @@ github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd h1:TRLaZ9cD/w
 github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd/go.mod h1:6dJC0mAP4ikYIbvyc7fijjWJddQyLn8Ig3JB5CqoB9Q=
 github.com/modern-go/reflect2 v1.0.2 h1:xBagoLtFs94CBntxluKeaWgTMpvLxC4ur3nMaC9Gz0M=
 github.com/modern-go/reflect2 v1.0.2/go.mod h1:yWuevngMOJpCy52FWWMvUC8ws7m/LJsjYzDa0/r8luk=
+github.com/palashbhasme/ecommerce_microservices v1.0.1 h1:jjmGbuH24+8QvMV5Zv80I54Rzi+BbvuUdEgNnjrdUCU=
+github.com/palashbhasme/ecommerce_microservices v1.0.1/go.mod h1:Cs0HaBwUxh8tGDQjEMUXx6cQiw2B+0HdyXcA6EnKlnk=
 github.com/palashbhasme/ecommerce_microservices/common v0.0.0-20250201163424-df90d56ba5be h1:H4KD5hDHNayWtXCA5njWfO3kmNiTkg4+nA/6LByBXzs=
 github.com/palashbhasme/ecommerce_microservices/common v0.0.0-20250201163424-df90d56ba5be/go.mod h1:fYWvWpw5T+GEzUJWeOq3qOkEgyft5Hi0dPzcqLNxyh4=
+github.com/palashbhasme/ecommerce_microservices/common v0.0.0-20250204181351-ae78ce2141be h1:qng5eteSLngC4A1Mp+xYqX/sRO8QwlPfxqRmSnF56gc=
+github.com/palashbhasme/ecommerce_microservices/common v0.0.0-20250204181351-ae78ce2141be/go.mod h1:fYWvWpw5T+GEzUJWeOq3qOkEgyft5Hi0dPzcqLNxyh4=
 github.com/pelletier/go-toml/v2 v2.2.2 h1:aYUidT7k73Pcl9nb2gScu7NSrKCSHIDE89b3+6Wq+LM=
 github.com/pelletier/go-toml/v2 v2.2.2/go.mod h1:1t835xjRzz80PqgE6HHgN2JOsmgYu/h4qDAS4n929Rs=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=

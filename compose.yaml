@@ -1,0 +1,93 @@
+services:
+    mongo:
+        image: mongo:latest
+        container_name: mongo_db
+        restart: always
+        environment:
+            - MONGO_INITDB_ROOT_USERNAME=root
+            - MONGO_INITDB_ROOT_PASSWORD=root
+        ports:
+            - "27017:27017"
+        volumes:
+            - mongo_data:/data/db
+
+    postgres:
+        image: postgres:17.2
+        container_name: postgres_db
+        restart: always
+        environment:
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: admin
+            POSTGRES_DB: default_db
+        ports:
+            - "5432:5432"
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
+            - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U postgres"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+            
+    rabbitmq:
+        image: rabbitmq:3-management
+        container_name: rabbitmq
+        restart: always
+        environment:
+            RABBITMQ_DEFAULT_USER: percy
+            RABBITMQ_DEFAULT_PASS: secret
+            RABBITMQ_DEFAULT_VHOST: backend
+        ports:
+            - "5672:5672"
+            - "15672:15672"
+        volumes:
+            - rabbitmq_data:/var/lib/rabbitmq
+        healthcheck:
+            test: ["CMD", "rabbitmqctl", "status"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+
+    user-service:
+        build: ./user_service
+        container_name: user_service
+        depends_on:
+            - mongo
+        env_file:
+            - ./user_service/.env
+        environment:
+            MONGO_URI: "mongodb://root:root@mongo:27017/?authSource=admin"
+        ports:
+            - "8080:8080"
+
+    inventory-service:
+        build: ./inventory_service
+        container_name: inventory_service
+        depends_on:
+            postgres:
+                condition: service_healthy
+            rabbitmq:
+                condition: service_healthy
+        env_file:
+            - ./inventory_service/.env
+        ports:
+            - "8081:8081"
+
+    order-service:
+        build: ./order_service
+        container_name: order_service
+        depends_on:
+            postgres:
+                condition: service_healthy
+            rabbitmq:
+                condition: service_healthy
+        env_file:
+            - ./order_service/.env
+        ports:
+            - "8082:8082"
+
+volumes:
+    postgres_data:
+    rabbitmq_data:
+    mongo_data:

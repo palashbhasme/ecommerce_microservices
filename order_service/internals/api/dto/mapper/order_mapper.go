@@ -6,8 +6,7 @@ import (
 	"github.com/palashbhasme/order_service/internals/domain/models"
 )
 
-func ToOrderModel() *models.Order {
-	var req request.OrderRequest
+func ToOrderModel(req request.OrderRequest) *models.Order {
 
 	order := &models.Order{
 		UserID:   req.UserID,

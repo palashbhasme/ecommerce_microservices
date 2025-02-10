@@ -7,7 +7,6 @@ import (
 	"github.com/palashbhasme/order_service/internals/api/dto/mapper"
 	"github.com/palashbhasme/order_service/internals/api/dto/request"
 	"github.com/palashbhasme/order_service/internals/api/rabbitmq"
-	"github.com/palashbhasme/order_service/internals/domain/models"
 	"github.com/palashbhasme/order_service/internals/domain/repository"
 	"github.com/rabbitmq/amqp091-go"
 	"go.uber.org/zap"
@@ -19,7 +18,7 @@ type OrderHandler struct {
 	connRabbit *amqp091.Connection
 }
 
-func InitializeOrderHandler(router *gin.Engine, repo repository.OrdersRepository, logger *zap.Logger, config rabbitmq.RabbitMQConfig) {
+func InitializeOrderHandler(router *gin.Engine, repo repository.OrdersRepository, logger *zap.Logger, config rabbitmq.RabbitMQConn) {
 	orderHandler := OrderHandler{
 		repo:       repo,
 		logger:     logger,
@@ -47,20 +46,21 @@ func (h *OrderHandler) CreateOrder(c *gin.Context) {
 		return
 	}
 
-	var items = make([]models.OrderItem, len(orderRequest.OrderItems))
+	// var items = make([]models.OrderItem, len(orderRequest.OrderItems))
 
-	for i, reqItem := range orderRequest.OrderItems {
-		items[i] = mapper.ToItemModel(reqItem)
-	}
+	// for i, reqItem := range orderRequest.OrderItems {
+	// 	items[i] = mapper.ToItemModel(reqItem)
+	// }
 
-	order := models.Order{
-		UserID:     orderRequest.UserID,
-		Quantity:   orderRequest.Quantity,
-		OrderItems: items,
-		Status:     models.OrderPending,
-	}
+	// order := models.Order{
+	// 	UserID:     orderRequest.UserID,
+	// 	Quantity:   orderRequest.Quantity,
+	// 	OrderItems: items,
+	// 	Status:     models.OrderPending,
+	// }
 
-	orderID, err := h.repo.CreateOrder(&order)
+	order := mapper.ToOrderModel(orderRequest)
+	orderID, err := h.repo.CreateOrder(order)
 	if err != nil {
 		h.logger.Error("error creating order", zap.Error(err))
 		c.JSON(400, gin.H{"message": "invalid request body"})
@@ -90,6 +90,7 @@ func (h *OrderHandler) GetOrderByID(c *gin.Context) {
 	if err != nil {
 		h.logger.Error("error failed to fetch order", zap.Error(err))
 		c.JSON(500, gin.H{"error": "falied to fetch order"})
+		return
 	}
 
 	orderResponse := mapper.ToOrderResponse(order)

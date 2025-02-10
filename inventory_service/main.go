@@ -8,6 +8,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/palashbhasme/ecommerce_microservices/common"
 	"github.com/palashbhasme/ecommerce_microservices/inventory_service/internals/api"
+	"github.com/palashbhasme/ecommerce_microservices/inventory_service/internals/api/rabbitmq"
 	"github.com/palashbhasme/ecommerce_microservices/inventory_service/internals/domain/models"
 	"github.com/palashbhasme/ecommerce_microservices/inventory_service/utils"
 	"go.uber.org/zap"
@@ -37,6 +38,14 @@ func main() {
 		DbName:   os.Getenv("DB_NAME"),
 		SSLMode:  "disable",
 	}
+
+	rabbitmqconfig := rabbitmq.RabbitMQConfig{
+		Host:     os.Getenv("RABBITMQ_HOST"),
+		User:     os.Getenv("RABBITMQ_USER"),
+		Password: os.Getenv("RABBITMQ_PASS"),
+		Vhost:    os.Getenv("RABBITMQ_VHOST"),
+	}
+
 	inventory_db, err := common.ConnectToDb(&config)
 	if err != nil {
 		log.Fatal("Error connecting to database", zap.Error(err))
@@ -49,7 +58,7 @@ func main() {
 	}
 
 	// Start the API server
-	err = api.RunServer(logger, inventory_db)
+	err = api.RunServer(logger, inventory_db, &rabbitmqconfig)
 	if err != nil {
 		log.Fatal("Error running server", zap.Error(err))
 	}

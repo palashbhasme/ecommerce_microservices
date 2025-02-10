@@ -42,5 +42,44 @@ type ProductVariant struct {
 
 func AutoMigrate(db *gorm.DB) error {
 	err := db.AutoMigrate(&Category{}, &Product{}, &ProductVariant{})
-	return err
+	if err != nil {
+		return err
+	}
+	// Now create the trigger
+	triggerSQL := `
+		CREATE OR REPLACE FUNCTION perform_stock_update()
+		RETURNS TRIGGER AS $$
+		BEGIN
+			IF TG_OP = 'INSERT' THEN
+				UPDATE products
+				SET stock_quantity = stock_quantity + NEW.stock_quantity
+				WHERE id = NEW.product_id;
+	
+			ELSIF TG_OP = 'UPDATE' THEN
+				UPDATE products
+				SET stock_quantity = stock_quantity - OLD.stock_quantity + NEW.stock_quantity
+				WHERE id = NEW.product_id;
+	
+			ELSIF TG_OP = 'DELETE' THEN
+				UPDATE products
+				SET stock_quantity = stock_quantity - OLD.stock_quantity
+				WHERE id = OLD.product_id;
+			END IF;
+	
+			RETURN NEW;
+		END;
+		$$ LANGUAGE plpgsql;
+	
+		CREATE TRIGGER stock_update
+		AFTER INSERT OR UPDATE OR DELETE
+		ON product_variants
+		FOR EACH ROW
+		EXECUTE FUNCTION perform_stock_update();
+		`
+
+	// Execute the trigger SQL
+	if err := db.Exec(triggerSQL).Error; err != nil {
+		return err
+	}
+	return nil
 }

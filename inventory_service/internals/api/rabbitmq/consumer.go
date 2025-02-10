@@ -56,7 +56,7 @@ func InventoryCheckConsumer(logger *zap.Logger, repo repository.PostgresReposito
 	}
 
 	// Start consuming messages
-	msgs, err := client.Consume("inventory_check", "", false)
+	msgs, err := client.Consume("inventory_check", "inventory_check_consumer", false)
 	if err != nil {
 		logger.Error("failed to start consuming messages", zap.Error(err))
 		return err

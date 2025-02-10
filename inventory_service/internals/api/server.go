@@ -3,15 +3,15 @@ package api
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/palashbhasme/ecommerce_microservices/inventory_service/internals/api/handlers"
+	"github.com/palashbhasme/ecommerce_microservices/inventory_service/internals/api/rabbitmq"
 	"github.com/palashbhasme/ecommerce_microservices/inventory_service/internals/domain/repository"
-	"github.com/palashbhasme/ecommerce_microservices/inventory_service/internals/rabbitmq"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
 
-func RunServer(logger *zap.Logger, db *gorm.DB) error {
+func RunServer(logger *zap.Logger, db *gorm.DB, rabbitmqconfig *rabbitmq.RabbitMQConfig) error {
 
-	conn, err := rabbitmq.InitializeRabbit()
+	conn, err := rabbitmqconfig.InitializeRabbit()
 	if err != nil {
 		logger.Error("Failed to connect to rabbit mq", zap.Error(err))
 	}

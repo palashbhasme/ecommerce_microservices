@@ -9,22 +9,22 @@ import (
 	"gorm.io/gorm"
 )
 
-func Server(logger *zap.Logger, db *gorm.DB) error {
-	router := gin.Default()
+func Server(logger *zap.Logger, db *gorm.DB, rabbitmqconfig *rabbitmq.RabbitMQConfig) error {
+
 	repo := repository.NewPostgresRepository(db)
-
-	config, err := rabbitmq.InitializeRabbit()
-	go func() {
-		if err := rabbitmq.UpdateOrderConsumer(logger, repo, config.Conn); err != nil {
-			logger.Error("error calling update order publisher", zap.Error(err))
-		}
-	}()
-
+	conn, err := rabbitmqconfig.InitializeRabbit()
 	if err != nil {
 		logger.Error("Failed to connect to rabbit mq", zap.Error(err))
 	}
 
-	handlers.InitializeOrderHandler(router, repo, logger, config)
+	go func() {
+		if err := rabbitmq.UpdateOrderConsumer(logger, repo, conn.Conn); err != nil {
+			logger.Error("error calling update order publisher", zap.Error(err))
+		}
+	}()
+
+	router := gin.Default()
+	handlers.InitializeOrderHandler(router, repo, logger, conn)
 	err = router.Run(":8082")
 	if err != nil {
 		return err

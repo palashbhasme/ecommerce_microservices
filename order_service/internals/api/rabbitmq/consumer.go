@@ -41,7 +41,7 @@ func UpdateOrderConsumer(logger *zap.Logger, repo repository.OrdersRepository, c
 		logger.Error("error binding queue", zap.Error(err))
 	}
 
-	msgs, err := client.Consume("order_update", "", false)
+	msgs, err := client.Consume("order_update", "order_update_consumer", false)
 	if err != nil {
 		logger.Error("failed to start consuming messages", zap.Error(err))
 		return err

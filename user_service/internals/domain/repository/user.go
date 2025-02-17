@@ -42,10 +42,6 @@ func (r *MongoUserRepository) UpdateUser(id primitive.ObjectID, user *models.Use
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	// Log user data
-	log.Printf("User data: %+v", user)
-
-	// Build the update fields
 	updateFields := bson.M{}
 	if user.FirstName != "" {
 		updateFields["first_name"] = user.FirstName
@@ -65,7 +61,7 @@ func (r *MongoUserRepository) UpdateUser(id primitive.ObjectID, user *models.Use
 
 	// If no fields to update, return early
 	if len(updateFields) == 0 {
-		return nil
+		return errors.New("no valid field provided to update")
 	}
 
 	update := bson.M{"$set": updateFields}

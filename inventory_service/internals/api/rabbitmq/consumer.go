@@ -100,7 +100,7 @@ func InventoryCheckConsumer(logger *zap.Logger, repo repository.PostgresReposito
 	defer client.Close()
 	// Handle SIGINT (Ctrl+C) and SIGTERM (Docker stop)
 	sigChan := make(chan os.Signal, 1)
-	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
+	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
 	<-sigChan // Wait for termination signal
 
 	logger.Info("Shutting down consumer...")

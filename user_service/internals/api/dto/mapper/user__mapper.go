@@ -43,7 +43,7 @@ func MapUserToResponse(user models.User) response.UserResponse {
 }
 
 // MapUserToRequest maps a UserRequest struct to a User model.
-func MapUserToRequest(user *request.UserRequest) models.User {
+func MapUserFromRequest(user *request.UserRequest) models.User {
 
 	return models.User{
 		FirstName: user.FirstName,

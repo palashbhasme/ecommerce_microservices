@@ -47,6 +47,8 @@ func AutoMigrate(db *gorm.DB) error {
 	}
 	// Now create the trigger
 	triggerSQL := `
+		DROP TRIGGER IF EXISTS 	stock_update on product_variants;
+
 		CREATE OR REPLACE FUNCTION perform_stock_update()
 		RETURNS TRIGGER AS $$
 		BEGIN

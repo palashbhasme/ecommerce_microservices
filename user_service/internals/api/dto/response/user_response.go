@@ -29,6 +29,7 @@ type AddressResponse struct {
 // AccountResponse represents the account data sent in API responses.
 type AccountResponse struct {
 	ID       string `json:"id"`
+	Role     string `json:"role"`
 	Username string `json:"username"`
 	IsActive bool   `json:"is_active"`
 }

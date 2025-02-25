@@ -7,7 +7,6 @@ import (
 	"syscall"
 
 	"github.com/palashbhasme/ecommerce_microservices/common"
-	"github.com/palashbhasme/order_service/internals/domain/models"
 	"github.com/palashbhasme/order_service/internals/domain/repository"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"go.uber.org/zap"
@@ -15,6 +14,7 @@ import (
 
 type UpdateOrder struct {
 	OrderID string `json:"order_id" binding:"required"`
+	Status  string `json:"status" binding:"required"`
 }
 
 func UpdateOrderConsumer(logger *zap.Logger, repo repository.OrdersRepository, conn *amqp.Connection) error {
@@ -51,12 +51,13 @@ func UpdateOrderConsumer(logger *zap.Logger, repo repository.OrdersRepository, c
 		var order UpdateOrder
 		if err := json.Unmarshal(msg.Body, &order); err != nil {
 			logger.Error("failed to parse message", zap.Error(err))
+			msg.Nack(false, false)
 			continue
 		}
 
 		// Initialize the map
 		status := map[string]interface{}{
-			"status": string(models.OrderConfirmed),
+			"status": order.Status,
 		}
 
 		// Call update order and check error

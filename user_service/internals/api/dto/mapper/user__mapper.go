@@ -25,7 +25,7 @@ func MapUserToResponse(user models.User) response.UserResponse {
 	}
 
 	return response.UserResponse{
-		ID:        user.ID,
+		ID:        string(user.ID),
 		FirstName: user.FirstName,
 		LastName:  user.LastName,
 		Email:     user.Email,
@@ -33,7 +33,7 @@ func MapUserToResponse(user models.User) response.UserResponse {
 		Phone:     user.Phone,
 		Addresses: addresses,
 		Account: response.AccountResponse{
-			ID:       user.Account.ID,
+			ID:       string(user.ID),
 			Username: user.Account.Username,
 			IsActive: user.Account.IsActive,
 		},
@@ -81,5 +81,6 @@ func mapAccount(reqAccount request.Account) models.Account {
 		Username:     reqAccount.Username,
 		PasswordHash: reqAccount.Password,
 		IsActive:     true,
+		Role:         reqAccount.Role,
 	}
 }

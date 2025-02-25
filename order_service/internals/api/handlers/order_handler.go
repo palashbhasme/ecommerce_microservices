@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/palashbhasme/order_service/internals/api/dto/mapper"
 	"github.com/palashbhasme/order_service/internals/api/dto/request"
+	"github.com/palashbhasme/order_service/internals/api/middlewares"
 	"github.com/palashbhasme/order_service/internals/api/rabbitmq"
 	"github.com/palashbhasme/order_service/internals/domain/repository"
 	"github.com/rabbitmq/amqp091-go"
@@ -28,9 +29,11 @@ func InitializeOrderHandler(router *gin.Engine, repo repository.OrdersRepository
 	api := router.Group("/api")
 	{
 		orderRoutes := api.Group("/orders/v1")
+		orderRoutes.Use(middlewares.AuthMiddleware())
 		{
 			orderRoutes.POST("/", orderHandler.CreateOrder)
 			orderRoutes.GET("/:id", orderHandler.GetOrderByID)
+			orderRoutes.GET("/user/:id", orderHandler.GetUserOrders)
 		}
 
 	}
@@ -96,4 +99,19 @@ func (h *OrderHandler) GetOrderByID(c *gin.Context) {
 	orderResponse := mapper.ToOrderResponse(order)
 	c.JSON(200, gin.H{"order": orderResponse})
 
+}
+
+func (h *OrderHandler) GetUserOrders(c *gin.Context) {
+	userID := c.Param("id")
+	h.logger.Info("Fetching orders by user id", zap.String("id", userID))
+
+	orders, err := h.repo.GetOrdersByUserID(userID)
+	if err != nil {
+		h.logger.Error("error failed to fetch orders", zap.Error(err))
+		c.JSON(500, gin.H{"error": "failed to fetch orders"})
+		return
+	}
+
+	orderResponses := mapper.ToOrderResponses(orders)
+	c.JSON(200, gin.H{"orders": orderResponses})
 }

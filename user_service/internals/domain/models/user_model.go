@@ -2,19 +2,25 @@ package models
 
 import (
 	"time"
+
+	"go.mongodb.org/mongo-driver/bson/bsontype"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+
+	"go.mongodb.org/mongo-driver/bson"
 )
 
+type MyObjectID string
 type User struct {
-	ID        string    `bson:"_id,omitempty" json:"id"`
-	FirstName string    `bson:"first_name" json:"first_name"`
-	LastName  string    `bson:"last_name" json:"last_name"`
-	Email     string    `bson:"email" json:"email"`
-	DOB       time.Time `bson:"dob" json:"dob"`
-	Phone     string    `bson:"phone" json:"phone"`
-	Addresses []Address `bson:"addresses" json:"addresses"`
-	Account   Account   `bson:"account" json:"account"`
-	CreatedAt string    `bson:"created_at" json:"created_at"`
-	UpdatedAt string    `bson:"updated_at" json:"updated_at"`
+	ID        MyObjectID `bson:"_id,omitempty" json:"id"`
+	FirstName string     `bson:"first_name" json:"first_name"`
+	LastName  string     `bson:"last_name" json:"last_name"`
+	Email     string     `bson:"email" json:"email"`
+	DOB       time.Time  `bson:"dob" json:"dob"`
+	Phone     string     `bson:"phone" json:"phone"`
+	Addresses []Address  `bson:"addresses" json:"addresses"`
+	Account   Account    `bson:"account" json:"account"`
+	CreatedAt string     `bson:"created_at" json:"created_at"`
+	UpdatedAt string     `bson:"updated_at" json:"updated_at"`
 }
 
 type Address struct {
@@ -30,7 +36,16 @@ type Address struct {
 
 type Account struct {
 	ID           string `bson:"_id,omitempty" json:"id"`
+	Role         string `bson:"role" json:"role"`
 	Username     string `bson:"username" json:"username"`
 	PasswordHash string `bson:"password_hash" json:"password_hash"` // Store hashed passwords only
 	IsActive     bool   `bson:"is_active" json:"is_active"`
+}
+
+func (id MyObjectID) MarshalBSONValue() (bsontype.Type, []byte, error) {
+	objectID, err := primitive.ObjectIDFromHex(string(id))
+	if err != nil {
+		return bson.TypeNull, nil, err
+	}
+	return bson.MarshalValue(objectID)
 }

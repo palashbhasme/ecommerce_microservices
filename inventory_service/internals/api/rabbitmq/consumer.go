@@ -55,12 +55,17 @@ func InventoryCheckConsumer(logger *zap.Logger, repo repository.PostgresReposito
 		return err
 	}
 
+	defer client.Close()
+
 	// Start consuming messages
 	msgs, err := client.Consume("inventory_check", "inventory_check_consumer", false)
 	if err != nil {
 		logger.Error("failed to start consuming messages", zap.Error(err))
 		return err
 	}
+	// Handle SIGINT (Ctrl+C) and SIGTERM (Docker stop)
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
 
 	go func() {
 		for msg := range msgs {
@@ -89,18 +94,15 @@ func InventoryCheckConsumer(logger *zap.Logger, repo repository.PostgresReposito
 			if available {
 				logger.Info("Stock available", zap.String("OrderID", request.OrderID), zap.Float64("TotalPrice", totalPrice))
 				msg.Ack(false)
-				UpdateOrderPublisher(request.OrderID, logger, conn)
+				UpdateOrderPublisher(request.OrderID, "confirmed", logger, conn)
 			} else {
 				logger.Warn("Stock not available for one or more products", zap.String("OrderID", request.OrderID))
-				msg.Nack(false, false)
+				msg.Ack(false)
+				UpdateOrderPublisher(request.OrderID, "cancelled", logger, conn)
 			}
 		}
 	}()
 
-	defer client.Close()
-	// Handle SIGINT (Ctrl+C) and SIGTERM (Docker stop)
-	sigChan := make(chan os.Signal, 1)
-	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
 	<-sigChan // Wait for termination signal
 
 	logger.Info("Shutting down consumer...")

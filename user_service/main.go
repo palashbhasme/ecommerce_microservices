@@ -5,6 +5,9 @@ import (
 	"log"
 	"os"
 
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.uber.org/zap"
 
 	"github.com/joho/godotenv"
@@ -40,6 +43,17 @@ func main() {
 	defer client.Disconnect(context.Background())
 
 	database := client.Database("users_database")
+
+	collection := database.Collection("users")
+	indexModel := mongo.IndexModel{
+		Keys:    bson.M{"email": 1},
+		Options: options.Index().SetUnique(true),
+	}
+
+	_, err = collection.Indexes().CreateOne(context.TODO(), indexModel)
+	if err != nil {
+		log.Fatal("Could not create index:", err)
+	}
 
 	repo := repository.NewMongoRepository(database)
 

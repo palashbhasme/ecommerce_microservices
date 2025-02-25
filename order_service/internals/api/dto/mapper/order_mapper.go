@@ -59,3 +59,13 @@ func ToOrderResponse(order *models.Order) response.OrderResponse {
 		OrderItems: orderItems,
 	}
 }
+
+func ToOrderResponses(orders []models.Order) []response.OrderResponse {
+	orderResponses := make([]response.OrderResponse, 0, len(orders))
+
+	for _, order := range orders {
+		orderResponses = append(orderResponses, ToOrderResponse(&order))
+	}
+
+	return orderResponses
+}

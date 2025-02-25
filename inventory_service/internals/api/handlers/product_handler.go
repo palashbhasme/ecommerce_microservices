@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/palashbhasme/ecommerce_microservices/inventory_service/internals/api/dto/mapper"
 	"github.com/palashbhasme/ecommerce_microservices/inventory_service/internals/api/dto/request"
+	"github.com/palashbhasme/ecommerce_microservices/inventory_service/internals/api/middlewares"
 	"github.com/palashbhasme/ecommerce_microservices/inventory_service/internals/domain/repository"
 
 	"go.uber.org/zap"
@@ -26,15 +27,22 @@ func NewProductHandler(router *gin.Engine, repo repository.ProductRepository, lo
 	api := router.Group("/api")
 	{
 		productRoutes := api.Group("/products/v1")
+		productRoutes.Use(middlewares.AuthMiddleware())
 		{
-			productRoutes.POST("/", productHandler.CreateProduct)
-			productRoutes.DELETE("/delete/:id", productHandler.DeleteProduct)
 			productRoutes.GET("/:id", productHandler.GetProduct)
-			productRoutes.GET("/getAll", productHandler.GetAllProducts)
-			productRoutes.GET("/getByCategoryID/:categoryID", productHandler.GetProductsByCategoryID)
-			productRoutes.GET("/getByCategoryName/:categoryName", productHandler.GetProductsByCategoryName)
-			productRoutes.POST("/checkStock/:id", productHandler.CheckStockLevel)
+			productRoutes.GET("/getall", productHandler.GetAllProducts)
+			productRoutes.GET("/getbycategoryid/:categoryID", productHandler.GetProductsByCategoryID)
+			productRoutes.GET("/getbycategoryname/:categoryName", productHandler.GetProductsByCategoryName)
+			productRoutes.POST("/checkstock/:id", productHandler.CheckStockLevel)
 			// productRoutes.POST("/updateStock/:id", productHandler.UpdateStockLevel) //no longer needed as it is handeld by rabbitmq
+
+			protectedRoutes := productRoutes.Group("/")
+			protectedRoutes.Use(middlewares.AdminMiddleware())
+			{
+				protectedRoutes.POST("/", productHandler.CreateProduct)
+				protectedRoutes.DELETE("/delete/:id", productHandler.DeleteProduct)
+
+			}
 		}
 	}
 }

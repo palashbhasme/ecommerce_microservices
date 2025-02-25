@@ -1,7 +1,7 @@
 package request
 
 type OrderRequest struct {
-	UserID     string         `json:"user_id" binding:"required,uuid"`     // Must be a valid UUID
+	UserID     string         `json:"user_id" binding:"required"`          // Must be a valid UUID
 	OrderItems []OrderItemReq `json:"order_items" binding:"required,dive"` // Validate each OrderItemReq
 	Quantity   int            `json:"quantity" binding:"required,gt=0"`    // Must be greater than 0
 }

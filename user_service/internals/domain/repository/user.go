@@ -3,20 +3,18 @@ package repository
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 	"time"
 
 	"github.com/palashbhasme/ecommerce_microservices/user_service/internals/domain/models"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type MongoUserRepository struct {
 	collection *mongo.Collection
 }
-
-var _ UserRepository = (*MongoUserRepository)(nil)
 
 func NewMongoRepository(db *mongo.Database) *MongoUserRepository {
 	return &MongoUserRepository{
@@ -38,7 +36,7 @@ func (r *MongoUserRepository) CreateUser(user *models.User) error {
 	return err
 }
 
-func (r *MongoUserRepository) UpdateUser(id primitive.ObjectID, user *models.User) error {
+func (r *MongoUserRepository) UpdateUser(id models.MyObjectID, user *models.User) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
@@ -80,18 +78,18 @@ func (r *MongoUserRepository) DeleteUser(id string) error {
 	return err
 }
 
-func (r *MongoUserRepository) GetUserById(id primitive.ObjectID) (*models.User, error) {
+func (r *MongoUserRepository) GetUserById(id models.MyObjectID) (*models.User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	var user *models.User
+	var user models.User
 	err := r.collection.FindOne(ctx, bson.M{"_id": id}).Decode(&user)
 
 	if err != nil {
 		return nil, errors.New("user for given id not found")
 	}
 
-	return user, nil
+	return &user, nil
 
 }
 
@@ -103,21 +101,38 @@ func (r *MongoUserRepository) GetAllUsers() ([]*models.User, error) {
 
 	cursor, err := r.collection.Find(ctx, bson.M{})
 	if err != nil {
-		return nil, errors.New("users not found")
+		return nil, fmt.Errorf("database error: %w", err)
 	}
 	defer cursor.Close(ctx)
 
 	for cursor.Next(ctx) {
 		var user models.User
-		if err = cursor.Decode(&user); err != nil {
-			return nil, err
+		if err := cursor.Decode(&user); err != nil {
+			return nil, fmt.Errorf("error decoding user: %w", err)
 		}
 		users = append(users, &user)
 	}
 
-	if err = cursor.Err(); err != nil {
-		return nil, err
+	if err := cursor.Err(); err != nil {
+		return nil, fmt.Errorf("cursor error: %w", err)
 	}
 
 	return users, nil
+}
+
+func (r *MongoUserRepository) GetUserByEmail(email string) (*models.User, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	var user models.User // Declare as a value, not a pointer
+	err := r.collection.FindOne(ctx, bson.M{"email": email}).Decode(&user)
+
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, nil // No user found is not an error
+		}
+		return nil, fmt.Errorf("database error: %w", err) // Handle other DB errors
+	}
+
+	return &user, nil // Return the address of the user struct
 }

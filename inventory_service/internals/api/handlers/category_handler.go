@@ -8,6 +8,7 @@ import (
 	"github.com/palashbhasme/ecommerce_microservices/inventory_service/internals/api/dto/mapper"
 	"github.com/palashbhasme/ecommerce_microservices/inventory_service/internals/api/dto/request"
 	"github.com/palashbhasme/ecommerce_microservices/inventory_service/internals/api/dto/response"
+	"github.com/palashbhasme/ecommerce_microservices/inventory_service/internals/api/middlewares"
 	"github.com/palashbhasme/ecommerce_microservices/inventory_service/internals/domain/repository"
 	"go.uber.org/zap"
 )
@@ -26,12 +27,19 @@ func NewCategoryHandler(router *gin.Engine, repo repository.CategoryRepository, 
 	api := router.Group("/api")
 	{
 		categoryRoutes := api.Group("/category/v1")
+		categoryRoutes.Use(middlewares.AuthMiddleware())
 		{
 			categoryRoutes.GET("/:id", categoryHandler.GetCategory)
-			categoryRoutes.GET("/getAll", categoryHandler.GetAllCategories)
-			categoryRoutes.PUT("/update/:id", categoryHandler.UpdateCategory)
-			categoryRoutes.POST("/", categoryHandler.CreateCategory)
-			categoryRoutes.DELETE("/delete/:id", categoryHandler.DeleteCategory)
+			categoryRoutes.GET("/getall", categoryHandler.GetAllCategories)
+
+			protectedRoutes := categoryRoutes.Group("/")
+			protectedRoutes.Use(middlewares.AdminMiddleware())
+			{
+				protectedRoutes.PUT("/update/:id", categoryHandler.UpdateCategory)
+				protectedRoutes.POST("/", categoryHandler.CreateCategory)
+				protectedRoutes.DELETE("/delete/:id", categoryHandler.DeleteCategory)
+			}
+
 		}
 	}
 }

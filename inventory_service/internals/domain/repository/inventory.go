@@ -231,7 +231,7 @@ func (r *PostgresRepository) DecrementStockLevel(variantIDs []string, quantities
 		// Check stock availability
 		if variant.StockQuantity < quantities[i] {
 			tx.Rollback()
-			return false, 0, fmt.Errorf("insufficient stock for %s, available: %d", variantID, variant.StockQuantity)
+			return false, 0, nil //Return no error as stock is not available
 		}
 
 		// Deduct stock and calculate total price

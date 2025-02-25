@@ -57,3 +57,13 @@ func (r *PostgresRepository) CreateOrderItem(orderItem *models.OrderItem) error 
 func (r *PostgresRepository) UpdateOrderStatus(id string, updates map[string]interface{}) error {
 	return r.db.Model(&models.Order{}).Where("order_id = ?", id).Updates(updates).Error
 }
+
+func (r *PostgresRepository) GetOrdersByUserID(userID string) ([]models.Order, error) {
+	var orders []models.Order
+	err := r.db.Preload("OrderItems").Model(models.Order{}).Find(&orders, "user_id = ?", userID).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return orders, nil
+}

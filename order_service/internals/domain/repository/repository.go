@@ -8,4 +8,5 @@ type OrdersRepository interface {
 	UpdateOrder(id string, order *models.Order) error
 	CreateOrderItem(orderItem *models.OrderItem) error
 	UpdateOrderStatus(id string, updates map[string]interface{}) error
+	GetOrdersByUserID(userID string) ([]models.Order, error)
 }

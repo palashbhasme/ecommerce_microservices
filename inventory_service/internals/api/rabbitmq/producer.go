@@ -11,9 +11,10 @@ import (
 
 type UpdateOrder struct {
 	OrderID string `json:"order_id" binding:"required"`
+	Status  string `json:"status" binding:"required"`
 }
 
-func UpdateOrderPublisher(orderId string, logger *zap.Logger, conn *amqp.Connection) {
+func UpdateOrderPublisher(orderId string, status string, logger *zap.Logger, conn *amqp.Connection) {
 	// Open a channel
 	client, err := common.NewRabbitMQClient(conn)
 	if err != nil {
@@ -40,6 +41,7 @@ func UpdateOrderPublisher(orderId string, logger *zap.Logger, conn *amqp.Connect
 
 	order := UpdateOrder{
 		OrderID: orderId,
+		Status:  status,
 	}
 
 	body, err := json.Marshal(order)

@@ -2,14 +2,16 @@ package handlers
 
 import (
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
+	"github.com/palashbhasme/ecommerce_microservices/common/middlewares"
+	common "github.com/palashbhasme/ecommerce_microservices/common/models"
 	"github.com/palashbhasme/ecommerce_microservices/user_service/internals/api/dto/mapper"
 	"github.com/palashbhasme/ecommerce_microservices/user_service/internals/api/dto/request"
 	"github.com/palashbhasme/ecommerce_microservices/user_service/internals/api/dto/response"
-	"github.com/palashbhasme/ecommerce_microservices/user_service/internals/api/middlewares"
 	"github.com/palashbhasme/ecommerce_microservices/user_service/internals/domain/models"
 	"github.com/palashbhasme/ecommerce_microservices/user_service/internals/domain/repository"
 	"github.com/palashbhasme/ecommerce_microservices/user_service/internals/services"
@@ -18,7 +20,7 @@ import (
 )
 
 var validate = request.NewValidator()
-var jwtKey = []byte("nivea_body_milk")
+var jwtKey = []byte(os.Getenv("JWT_SECRET"))
 
 type UserHandler struct {
 	Repo repository.UserRepository
@@ -30,7 +32,7 @@ func InitializeRoutes(router *gin.Engine, log *zap.Logger, repo repository.UserR
 		Repo: repo,
 		log:  log,
 	}
-
+	authconfig := common.NewAuthConfig(os.Getenv("JWT_SECRET"))
 	api := router.Group("/api")
 	{
 		userRoutes := api.Group("/users/v1")
@@ -41,7 +43,7 @@ func InitializeRoutes(router *gin.Engine, log *zap.Logger, repo repository.UserR
 
 		// Protected Routes (Require Authentication)
 		protectedRoutes := userRoutes.Group("/")
-		protectedRoutes.Use(middlewares.AuthMiddleware()) // Apply authentication middleware
+		protectedRoutes.Use(middlewares.AuthMiddleware(*authconfig)) // Apply authentication middleware
 		{
 			protectedRoutes.GET("/:id", handler.GetUserById)
 			protectedRoutes.PUT("/:id", handler.UpdateUser)

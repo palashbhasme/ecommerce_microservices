@@ -6,7 +6,7 @@ require (
 	github.com/gin-gonic/gin v1.10.0
 	github.com/google/uuid v1.6.0
 	github.com/joho/godotenv v1.5.1
-	github.com/palashbhasme/ecommerce_microservices/common v0.0.0-20250204181351-ae78ce2141be
+	github.com/palashbhasme/ecommerce_microservices/common v0.0.0-20250225111925-da203df2cc85
 	github.com/rabbitmq/amqp091-go v1.10.0
 	go.uber.org/zap v1.27.0
 	gorm.io/gorm v1.25.12

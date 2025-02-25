@@ -67,6 +67,8 @@ github.com/modern-go/reflect2 v1.0.2 h1:xBagoLtFs94CBntxluKeaWgTMpvLxC4ur3nMaC9G
 github.com/modern-go/reflect2 v1.0.2/go.mod h1:yWuevngMOJpCy52FWWMvUC8ws7m/LJsjYzDa0/r8luk=
 github.com/palashbhasme/ecommerce_microservices/common v0.0.0-20250204180330-0578fbaa8fd1 h1:/iqNdYG21VG079s4MS6VvX362OfP2cqVJbhl2OwBGnc=
 github.com/palashbhasme/ecommerce_microservices/common v0.0.0-20250204180330-0578fbaa8fd1/go.mod h1:fYWvWpw5T+GEzUJWeOq3qOkEgyft5Hi0dPzcqLNxyh4=
+github.com/palashbhasme/ecommerce_microservices/common v0.0.0-20250225111925-da203df2cc85 h1:YYJqcNEJ+qEdWqu2SqaWDVtb5BFLMRpfP8Rae3j32HU=
+github.com/palashbhasme/ecommerce_microservices/common v0.0.0-20250225111925-da203df2cc85/go.mod h1:FPcyxvjFzBEeF68pDg8i2LBc2buYZvW29d50U+r+KIQ=
 github.com/pelletier/go-toml/v2 v2.2.2 h1:aYUidT7k73Pcl9nb2gScu7NSrKCSHIDE89b3+6Wq+LM=
 github.com/pelletier/go-toml/v2 v2.2.2/go.mod h1:1t835xjRzz80PqgE6HHgN2JOsmgYu/h4qDAS4n929Rs=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=

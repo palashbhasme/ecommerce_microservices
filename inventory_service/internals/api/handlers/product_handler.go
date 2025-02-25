@@ -2,12 +2,15 @@ package handlers
 
 import (
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/palashbhasme/ecommerce_microservices/common/middlewares"
+	"github.com/palashbhasme/ecommerce_microservices/common/models"
 	"github.com/palashbhasme/ecommerce_microservices/inventory_service/internals/api/dto/mapper"
 	"github.com/palashbhasme/ecommerce_microservices/inventory_service/internals/api/dto/request"
-	"github.com/palashbhasme/ecommerce_microservices/inventory_service/internals/api/middlewares"
+
 	"github.com/palashbhasme/ecommerce_microservices/inventory_service/internals/domain/repository"
 
 	"go.uber.org/zap"
@@ -23,11 +26,11 @@ func NewProductHandler(router *gin.Engine, repo repository.ProductRepository, lo
 		repo:   repo,
 		logger: logger,
 	}
-
+	authconfig := models.NewAuthConfig(os.Getenv("JWT_SECRET"))
 	api := router.Group("/api")
 	{
 		productRoutes := api.Group("/products/v1")
-		productRoutes.Use(middlewares.AuthMiddleware())
+		productRoutes.Use(middlewares.AuthMiddleware(*authconfig))
 		{
 			productRoutes.GET("/:id", productHandler.GetProduct)
 			productRoutes.GET("/getall", productHandler.GetAllProducts)

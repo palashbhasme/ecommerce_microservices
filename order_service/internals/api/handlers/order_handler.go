@@ -2,11 +2,13 @@ package handlers
 
 import (
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
+	"github.com/palashbhasme/ecommerce_microservices/common/middlewares"
+	"github.com/palashbhasme/ecommerce_microservices/common/models"
 	"github.com/palashbhasme/order_service/internals/api/dto/mapper"
 	"github.com/palashbhasme/order_service/internals/api/dto/request"
-	"github.com/palashbhasme/order_service/internals/api/middlewares"
 	"github.com/palashbhasme/order_service/internals/api/rabbitmq"
 	"github.com/palashbhasme/order_service/internals/domain/repository"
 	"github.com/rabbitmq/amqp091-go"
@@ -25,11 +27,12 @@ func InitializeOrderHandler(router *gin.Engine, repo repository.OrdersRepository
 		logger:     logger,
 		connRabbit: config.Conn,
 	}
+	authconfig := models.NewAuthConfig(os.Getenv("JWT_SECRET"))
 
 	api := router.Group("/api")
 	{
 		orderRoutes := api.Group("/orders/v1")
-		orderRoutes.Use(middlewares.AuthMiddleware())
+		orderRoutes.Use(middlewares.AuthMiddleware(*authconfig))
 		{
 			orderRoutes.POST("/", orderHandler.CreateOrder)
 			orderRoutes.GET("/:id", orderHandler.GetOrderByID)
@@ -48,19 +51,6 @@ func (h *OrderHandler) CreateOrder(c *gin.Context) {
 		c.JSON(400, gin.H{"message": "invalid request body"})
 		return
 	}
-
-	// var items = make([]models.OrderItem, len(orderRequest.OrderItems))
-
-	// for i, reqItem := range orderRequest.OrderItems {
-	// 	items[i] = mapper.ToItemModel(reqItem)
-	// }
-
-	// order := models.Order{
-	// 	UserID:     orderRequest.UserID,
-	// 	Quantity:   orderRequest.Quantity,
-	// 	OrderItems: items,
-	// 	Status:     models.OrderPending,
-	// }
 
 	order := mapper.ToOrderModel(orderRequest)
 	orderID, err := h.repo.CreateOrder(order)

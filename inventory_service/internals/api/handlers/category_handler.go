@@ -2,13 +2,16 @@ package handlers
 
 import (
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/palashbhasme/ecommerce_microservices/common/middlewares"
+	"github.com/palashbhasme/ecommerce_microservices/common/models"
+
 	"github.com/palashbhasme/ecommerce_microservices/inventory_service/internals/api/dto/mapper"
 	"github.com/palashbhasme/ecommerce_microservices/inventory_service/internals/api/dto/request"
 	"github.com/palashbhasme/ecommerce_microservices/inventory_service/internals/api/dto/response"
-	"github.com/palashbhasme/ecommerce_microservices/inventory_service/internals/api/middlewares"
 	"github.com/palashbhasme/ecommerce_microservices/inventory_service/internals/domain/repository"
 	"go.uber.org/zap"
 )
@@ -23,11 +26,12 @@ func NewCategoryHandler(router *gin.Engine, repo repository.CategoryRepository, 
 		categoryRepo: repo,
 		logger:       logger,
 	}
+	authconfig := models.NewAuthConfig(os.Getenv("JWT_SECRET"))
 
 	api := router.Group("/api")
 	{
 		categoryRoutes := api.Group("/category/v1")
-		categoryRoutes.Use(middlewares.AuthMiddleware())
+		categoryRoutes.Use(middlewares.AuthMiddleware(*authconfig))
 		{
 			categoryRoutes.GET("/:id", categoryHandler.GetCategory)
 			categoryRoutes.GET("/getall", categoryHandler.GetAllCategories)

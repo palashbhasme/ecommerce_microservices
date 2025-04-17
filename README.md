@@ -15,7 +15,7 @@ Order processing with RabbitMQ event-driven updates.
 
 ## Installation
 Clone the repository using  
-`git clone https://github.com/your-username/your-repo.git`
+`git clone https://github.com/palashbhasme/ecommerce_microservices.git`
 
 Set up environtment variables using .env file in respective services 
 
